@@ -79,61 +79,11 @@ def get_db_conn(url: Optional[str] = DATABASE_URL) -> Session:
         if not os.path.exists(DATABASE_FILE):
             logger.info("Database file does not exist. Initializing database...")
             conn = init_db()
-            logger.info("Database initialized.")
         else:
             engine = create_engine(url)
             conn = create_session(engine)
-            logger.info("Connected to Database")
+        logger.info("Connected to Database")  
         return conn
     except Exception as e:
         logger.error(f"Error connecting to database: {e}", exc_info=True)
         raise
-
-
-
-
-# def import_quotes_from_json(file_path: str) -> dict[str, tuple]:
-#     """Imports quotes from a JSON file into the database."""
-#     logger.info(f"Importing quotes from {file_path}...")
-    
-#     try:
-#         with open(file_path, 'r') as f:
-#                     data = json.load(f)
-#                     return data
-#     except FileNotFoundError as e:
-#         logger.error(f"File not found: {e}", exc_info=True)
-#         raise
-#     except Exception as e:
-#         logger.error(f"An error occurred: {e}", exc_info=True)
-#         raise
-    
-# def load_quotes_to_db(data, db):
-#     with db as session:
-#         try:
-#             for category, quotes in data.items():
-#                 for quote_entry in quotes:
-#                     new_quote = Quote(
-#                         text=quote_entry.get('quote'),
-#                         author=quote_entry.get('author'),
-#                         category=category
-#                     )
-
-#                     session.add(new_quote)
-            
-#             session.commit()
-#             logger.info(f"Quotes saved to db.")
-        
-#         except Exception as e:
-#             session.rollback()
-#             logger.error(f"Error importing quotes from JSON: {e}", exc_info=True)
-#             raise
-#         finally:
-#             session.close()
-#             logger.info("Database session closed.")
-
-# if __name__ == "__main__":
-#     data = import_quotes_from_json('category.json')
-#     db = create_session(init_db())
-#     load_quotes_to_db(data, db)
-
-
