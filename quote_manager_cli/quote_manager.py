@@ -1,4 +1,4 @@
-from database import Quote
+from .database import Quote
 from sqlalchemy.orm import Session
 import json
 import logging
@@ -7,12 +7,13 @@ import random
 
 logger = logging.getLogger(__name__)
 
+
 def load_quotes_from_json(file_path: str) -> dict[str, tuple]:
     """Imports quotes from a JSON file into the database."""
     logger.info(f"Importing quotes from {file_path}...")
-    
+
     try:
-        with open(file_path, 'r') as f:
+        with open(file_path, "r") as f:
             data = json.load(f)
             return data
     except FileNotFoundError as e:
@@ -22,17 +23,18 @@ def load_quotes_from_json(file_path: str) -> dict[str, tuple]:
         logger.error(f"An error occurred: {e}", exc_info=True)
         raise
 
+
 def load_quotes_to_db(db: Session, data: dict[str, tuple]) -> None:
     """Loads quotes into the database."""
     logger.info("Loading quotes into the database...")
-    
+
     try:
         for category, quotes in data.items():
             for quote_entry in quotes:
                 new_quote = Quote(
-                    text=quote_entry.get('quote'),
-                    author=quote_entry.get('author'),
-                    category=category
+                    text=quote_entry.get("quote"),
+                    author=quote_entry.get("author"),
+                    category=category,
                 )
                 db.add(new_quote)
         db.commit()
@@ -45,12 +47,15 @@ def load_quotes_to_db(db: Session, data: dict[str, tuple]) -> None:
         db.close()
         logger.info("Database session closed.")
 
-def add_quote(db: Session, category: str, text: str, author: Optional[str] = None) -> None:
+
+def add_quote(
+    db: Session, category: str, text: str, author: Optional[str] = None
+) -> None:
     """Adds a new quote to the database."""
     logger.info(f"Adding quote: {text} - {category}...")
-    
+
     try:
-        if author != None:
+        if author is not None:
             new_quote = Quote(text=text, author=author, category=category)
         else:
             new_quote = Quote(text=text, author="Unknown", category=category)
@@ -65,7 +70,8 @@ def add_quote(db: Session, category: str, text: str, author: Optional[str] = Non
         db.close()
         logger.info("Database session closed.")
 
-def list_quotes(db: Session, category:Optional[str] = None) -> list[Quote]:
+
+def list_quotes(db: Session, category: Optional[str] = None) -> list[Quote]:
     """Lists quotes from the database."""
     logger.info("Listing quotes...")
 
@@ -82,10 +88,11 @@ def list_quotes(db: Session, category:Optional[str] = None) -> list[Quote]:
         db.close()
         logger.info("Database session closed.")
 
-def generate_random_quote(db: Session, category: Optional[str] = None) -> Quote:
+
+def generate_random_quote(db: Session, category: Optional[str] = None) -> Quote | None:
     """Generates a random quote from the database."""
     logger.info("Generating random quote...")
-    
+
     try:
         if category:
             quotes = db.query(Quote).filter_by(category=category).all()
@@ -103,4 +110,3 @@ def generate_random_quote(db: Session, category: Optional[str] = None) -> Quote:
     finally:
         db.close()
         logger.info("Database session closed.")
-        
