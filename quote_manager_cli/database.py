@@ -1,4 +1,3 @@
-import logging
 from sqlalchemy import (
     inspect,
     create_engine,
@@ -13,26 +12,8 @@ from datetime import datetime
 from typing import Any, Type
 import os
 import sys
+from .logger_config import info_logger, error_logger
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger()
-
-
-# # Configure the logging
-# logging.basicConfig(
-#     level=logging.INFO,
-#     format='%(asctime)s - %(levelname)s - %(message)s',
-#     handlers=[
-#         logging.FileHandler('/var/log/quote_manager.log'),  # Info log file
-#         logging.FileHandler('/var/log/quote_manager-error.log'),
-#  # Error log file
-#         logging.StreamHandler()  # Output to console
-#     ]
-# )
-
-# # Create a custom logger
-# logger = logging.getLogger()
 
 # Fetch database path from environment variable, with a default fallback
 DATABASE_FILE = os.getenv(
@@ -58,33 +39,33 @@ class Quote(Base):
 
 def create_session(engine: Any) -> Session:
     """Creates and returns a new database session."""
-    logger.info("Creating a new database session...")
     try:
         SessionLocal = sessionmaker(bind=engine)
+        info_logger.info("Database session created.")
         return SessionLocal()
     except Exception as e:
-        logger.error(f"Error creating session: {e}", exc_info=True)
+        error_logger.error(f"Error creating session: {e}", exc_info=True)
         raise
 
 
 def init_db() -> Session:
     """Sets up the quotes database and connects to it"""
-    logger.info("Setting up database...")
+    info_logger.info("Setting up database...")
     try:
         engine = create_engine(DATABASE_URL)
         inspector = inspect(engine)
         if "quotes" in inspector.get_table_names():
             Base.metadata.drop_all(tables=[Quote.__table__], bind=engine)
-            logger.info("Existing table dropped.")
+            info_logger.info("Existing table dropped.")
 
         Base.metadata.create_all(engine)
-        logger.info("Database setup complete.")
+        info_logger.info("Database setup complete.")
 
         conn = create_session(engine)
         return conn
 
     except Exception as e:
-        logger.error(f"Error setting up database: {e}", exc_info=True)
+        error_logger.error(f"Error setting up database: {e}", exc_info=True)
         raise
 
 
@@ -92,16 +73,17 @@ def get_db_conn(url: str = DATABASE_URL) -> Session:
     """Create connection to a database"""
     try:
         if not os.path.exists(DATABASE_FILE):
-            logger.error(
+            error_logger.error(
                 "Database file does not exist. \
                     Initialize database with `quote init`"
             )
-            sys.exit("Database file does not exist. Exiting program.")
+            sys.exit("Database file does not exist. Run `quote init`. Exiting program.")
         else:
             engine = create_engine(url)
             conn = create_session(engine)
-            logger.info("Connected to Database")
+            info_logger.info("Connected to Database")
             return conn
     except Exception as e:
-        logger.error(f"Error connecting to database: {e}", exc_info=True)
+        error_logger.error(f"Error connecting to database: {e}", exc_info=True)
         raise
+
