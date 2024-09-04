@@ -9,17 +9,16 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import sessionmaker, declarative_base, Session
 from datetime import datetime
-from typing import Any, Type
+from typing import Any, Type, Optional
 import os
 import sys
 from .logger_config import info_logger, error_logger
+from dotenv import load_dotenv
 
+load_dotenv()
 
 # Fetch database path from environment variable, with a default fallback
-DATABASE_FILE = os.getenv(
-    "DATABASE_PATH", os.path.join(os.path.dirname(__file__), "quotes.db")
-)
-
+DATABASE_FILE = os.getenv("DATABASE_PATH", "default.db")
 DATABASE_URL = f"duckdb:///{DATABASE_FILE}"
 
 Base: Type[Any] = declarative_base()
@@ -36,15 +35,27 @@ class Quote(Base):
     created_at = Column(DateTime, default=datetime.now)
 
 
-def create_session(engine: Any) -> Session:
+def get_engine(url: str = DATABASE_URL) -> Any:
+    """Creates and returns a new database engine."""
+    try:
+        engine = create_engine(url)
+        return engine
+    except Exception as e:
+        error_logger.error(f"Error creating engine: {e}", exc_info=True)
+    return None
+
+
+def create_session(engine: Any) -> Optional[Session]:
     """Creates and returns a new database session."""
     try:
         SessionLocal = sessionmaker(bind=engine)
-        info_logger.info("Database session created.")
+        info_logger.info(f"Connection to {DATABASE_FILE} database established")
         return SessionLocal()
     except Exception as e:
         error_logger.error(f"Error creating session: {e}", exc_info=True)
-    
+    return None
+
+
 def drop_existing_table(engine: Any) -> None:
     """Drops the existing quotes table."""
     try:
@@ -54,11 +65,11 @@ def drop_existing_table(engine: Any) -> None:
         error_logger.error(f"Error dropping table: {e}", exc_info=True)
 
 
-def init_db(db_url: str = DATABASE_URL) -> Session:
+def init_db(db_url: str = DATABASE_URL) -> Optional[Session]:
     """Sets up the quotes database and connects to it"""
     info_logger.info("Setting up database...")
     try:
-        engine = create_engine(db_url)
+        engine = get_engine(db_url)
         inspector = inspect(engine)
         if "quotes" in inspector.get_table_names():
             drop_existing_table(engine)
@@ -70,9 +81,12 @@ def init_db(db_url: str = DATABASE_URL) -> Session:
         return conn
     except Exception as e:
         error_logger.error(f"Error setting up database: {e}", exc_info=True)
-        
+    return None
 
-def get_db_conn(url: str = DATABASE_URL, db_file: str = DATABASE_FILE) -> Session:
+
+def get_db_conn(
+    url: str = DATABASE_URL, db_file: str = DATABASE_FILE
+) -> Optional[Session]:
     """Create connection to an existing database"""
     try:
         if not os.path.exists(db_file):
@@ -80,13 +94,15 @@ def get_db_conn(url: str = DATABASE_URL, db_file: str = DATABASE_FILE) -> Sessio
                 "Database file does not exist. \
                     Initialize database with `quote init`"
             )
-            sys.exit("Database file does not exist. Run `quote init`. Exiting program.")
+            sys.exit(
+                "Database file does not exist. \
+                     Run `quote init`. Exiting program."
+            )
         else:
-            engine = create_engine(url)
+            engine = get_engine(url)
             conn = create_session(engine)
             info_logger.info("Connected to Database")
             return conn
     except Exception as e:
         error_logger.error(f"Error connecting to database: {e}", exc_info=True)
-
-
+    return None

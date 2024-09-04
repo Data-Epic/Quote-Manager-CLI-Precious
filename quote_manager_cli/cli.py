@@ -1,16 +1,15 @@
 import click
-import json
 import os
 from .quote_manager import (
     load_quotes_from_json,
     load_quotes_to_db,
     add_quote,
     list_quotes,
-    generate_random_quote
+    generate_random_quote,
 )
 from .database import init_db, get_db_conn
 from typing import Optional
-from .logger_config import info_logger, error_logger 
+from .logger_config import info_logger, error_logger
 
 
 @click.group()
@@ -28,23 +27,26 @@ def cli() -> None:
 def init(file: str) -> None:
     """Initialize the database with quotes from a JSON file."""
     if not os.path.exists(file):
-        click.echo(f"Error: {file} does not exist. Please enter a valid json file path.")
+        click.echo(
+            f"Error: {file} does not exist.\
+                    Please enter a valid json file path."
+        )
         error_logger.error(f"Error: {file} does not exist", exc_info=True)
         return
 
-    try:    
+    try:
         data = load_quotes_from_json(file)
         if not data:
             click.echo(f"Error: {file} is empty or is not a valid JSON file.")
             return
-             
+
         click.echo(f"Initializing database with quotes from {file}...")
         init_conn = init_db()
         count = load_quotes_to_db(init_conn, data)
         click.echo(f"{count} quotes added")
     except Exception as e:
         error_logger.error(f"Error initializing database: {e}", exc_info=True)
-        click.echo(f"Error initializing database: Database initialization failed")
+        click.echo("Error: Database initialization failed")
 
 
 @cli.command()
@@ -59,6 +61,7 @@ def add(category: str, text: str, author: Optional[str] = None) -> None:
         click.echo("Quote added successfully.")
     except Exception as e:
         error_logger.error(f"Error adding quote: {e}", exc_info=True)
+        click.echo("Error adding quote.")
 
 
 @cli.command()
@@ -77,7 +80,7 @@ def list(category: Optional[str] = None) -> None:
         info_logger.info(f"Listed 5 quotes in {category}")
     except Exception as e:
         error_logger.error(f"Error listing quotes: {e}", exc_info=True)
-
+        click.echo("Error listing quotes.")
 
 
 @cli.command()
@@ -95,9 +98,8 @@ def generate(category: Optional[str] = None) -> None:
             info_logger.info("No quotes found.")
     except Exception as e:
         error_logger.error(f"Error generating quote: {e}", exc_info=True)
-
+        click.echo("Error generating quote.")
 
 
 if __name__ == "__main__":
     cli()
-

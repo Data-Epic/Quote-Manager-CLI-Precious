@@ -1,9 +1,8 @@
 from .database import Quote
-from sqlalchemy.orm import Session
 import json
-from typing import Optional
+from typing import Optional, Any
 import random
-from .logger_config import info_logger, error_logger, console_logger
+from .logger_config import info_logger, error_logger
 
 
 def load_quotes_from_json(file_path: str) -> dict[str, tuple]:
@@ -20,9 +19,10 @@ def load_quotes_from_json(file_path: str) -> dict[str, tuple]:
         error_logger.error(f"File not found: {e}", exc_info=True)
     except Exception as e:
         error_logger.error(f"An error occurred: {e}", exc_info=True)
+    return {}
 
 
-def load_quotes_to_db(db: Session, data: dict[str, tuple]) -> None:
+def load_quotes_to_db(db: Any, data: dict[str, tuple]) -> int:
     """Loads quotes into the database."""
     info_logger.info("Loading quotes into the database...")
     count = 0
@@ -35,7 +35,7 @@ def load_quotes_to_db(db: Session, data: dict[str, tuple]) -> None:
                     category=category.lower(),
                 )
                 db.add(new_quote)
-                count+=1
+                count += 1
         db.commit()
         info_logger.info(f"{count} Quotes saved to db.")
     except Exception as e:
@@ -45,15 +45,13 @@ def load_quotes_to_db(db: Session, data: dict[str, tuple]) -> None:
         db.close()
     return count
 
-        
-def add_quote(
-    db: Session, category: str, text: str, author: Optional[str] = None
-) -> None:
+
+def add_quote(db: Any, category: str, text: str, author: Optional[str] = None) -> None:
     """Adds a new quote to the database."""
     info_logger.info(f"Adding quote: {text} - {category}...")
 
     try:
-        category = category.lower() # standardize category
+        category = category.lower()  # standardize category
         if author is not None:
             new_quote = Quote(text=text, author=author, category=category)
         else:
@@ -68,8 +66,7 @@ def add_quote(
         db.close()
 
 
-
-def list_quotes(db: Session, category: Optional[str] = None) -> list[Quote]:
+def list_quotes(db: Any, category: Optional[str] = None) -> list[Quote]:
     """Lists quotes from the database."""
     info_logger.info("Listing quotes...")
 
@@ -83,9 +80,10 @@ def list_quotes(db: Session, category: Optional[str] = None) -> list[Quote]:
         error_logger.error(f"Error listing quotes: {e}", exc_info=True)
     finally:
         db.close()
+    return []
 
 
-def generate_random_quote(db: Session, category: Optional[str] = None) -> Quote | None:
+def generate_random_quote(db: Any, category: Optional[str] = None) -> Quote | None:
     """Generates a random quote from the database."""
     info_logger.info("Generating random quote...")
 
@@ -98,10 +96,9 @@ def generate_random_quote(db: Session, category: Optional[str] = None) -> Quote 
             quote = random.choice(quotes)
         else:
             info_logger.info("No quotes found.")
-            return None
         return quote
     except Exception as e:
         error_logger.error(f"Error generating random quote: {e}", exc_info=True)
     finally:
         db.close()
-
+    return None

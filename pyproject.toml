@@ -17,9 +17,10 @@ keywords = ["Quote Manager", "CLI Tool"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-
-[tool.poetry.scripts]
-
+duckdb-engine = "^0.13.1"
+sqlalchemy = "^2.0.32"
+click = "^8.1.7"
+python-dotenv = "^1.0.1"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.3.2"
@@ -30,8 +31,10 @@ flake8 = "^7.1.1"
 black = "^24.8.0"
 isort = "^5.13.2"
 mypy = "^1.11.2"
-pre-commit = "^3.8.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+quote = "quote_manager_cli.cli:cli"
