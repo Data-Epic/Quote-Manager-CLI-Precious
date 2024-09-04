@@ -48,11 +48,11 @@ def create_session(engine: Any) -> Session:
         raise
 
 
-def init_db() -> Session:
+def init_db(db_url: str = DATABASE_URL) -> Session:
     """Sets up the quotes database and connects to it"""
     info_logger.info("Setting up database...")
     try:
-        engine = create_engine(DATABASE_URL)
+        engine = create_engine(db_url)
         inspector = inspect(engine)
         if "quotes" in inspector.get_table_names():
             Base.metadata.drop_all(tables=[Quote.__table__], bind=engine)
