@@ -3,23 +3,22 @@ from sqlalchemy.orm import Session
 import json
 from typing import Optional
 import random
-from .logger_config import info_logger, error_logger
+from .logger_config import info_logger, error_logger, console_logger
 
 
-def load_quotes_from_json(file_path: str) -> dict[str, tuple]:
-    """Imports quotes from a JSON file into the database."""
-    info_logger.info(f"Importing quotes from {file_path}...")
+# def load_quotes_from_json(file_path: str) -> dict[str, tuple]:
+#     """Imports quotes from a JSON file into the database."""
+#     info_logger.info(f"Importing quotes from {file_path}...")
 
-    try:
-        with open(file_path, "r") as f:
-            data = json.load(f)
-            return data
-    except FileNotFoundError as e:
-        error_logger.error(f"File not found: {e}", exc_info=True)
-        raise
-    except Exception as e:
-        error_logger.error(f"An error occurred: {e}", exc_info=True)
-        raise
+#     try:
+#         with open(file_path, "r") as f:
+#             data = json.load(f)
+#             return data
+#     except FileNotFoundError as e:
+#         error_logger.error(f"File not found: {e}", exc_info=True)
+#     except Exception as e:
+#         error_logger.error(f"An error occurred: {e}", exc_info=True)
+#         raise
 
 
 def load_quotes_to_db(db: Session, data: dict[str, tuple]) -> None:
@@ -31,7 +30,7 @@ def load_quotes_to_db(db: Session, data: dict[str, tuple]) -> None:
                 new_quote = Quote(
                     text=quote_entry.get("quote"),
                     author=quote_entry.get("author"),
-                    category=category,
+                    category=category.lower(),
                 )
                 db.add(new_quote)
         db.commit()
@@ -50,6 +49,7 @@ def add_quote(
     info_logger.info(f"Adding quote: {text} - {category}...")
 
     try:
+        category = category.lower() # standardize category
         if author is not None:
             new_quote = Quote(text=text, author=author, category=category)
         else:
@@ -71,6 +71,7 @@ def list_quotes(db: Session, category: Optional[str] = None) -> list[Quote]:
     info_logger.info("Listing quotes...")
 
     try:
+        category = category.lower() # standardize category
         if category:
             quotes = db.query(Quote).filter_by(category=category).all()
         else:
@@ -88,6 +89,7 @@ def generate_random_quote(db: Session, category: Optional[str] = None) -> Quote 
     info_logger.info("Generating random quote...")
 
     try:
+        category = category.lower() # standardize category
         if category:
             quotes = db.query(Quote).filter_by(category=category).all()
         else:
