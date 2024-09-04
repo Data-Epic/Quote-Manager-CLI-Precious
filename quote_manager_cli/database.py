@@ -34,7 +34,6 @@ class Quote(Base):
     author = Column(String)
     category = Column(String)
     created_at = Column(DateTime, default=datetime.now)
-    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
 
 def create_session(engine: Any) -> Session:
@@ -45,7 +44,14 @@ def create_session(engine: Any) -> Session:
         return SessionLocal()
     except Exception as e:
         error_logger.error(f"Error creating session: {e}", exc_info=True)
-        raise
+    
+def drop_existing_table(engine: Any) -> None:
+    """Drops the existing quotes table."""
+    try:
+        Base.metadata.drop_all(tables=[Quote.__table__], bind=engine)
+        info_logger.info("Existing table dropped.")
+    except Exception as e:
+        error_logger.error(f"Error dropping table: {e}", exc_info=True)
 
 
 def init_db(db_url: str = DATABASE_URL) -> Session:
@@ -55,24 +61,21 @@ def init_db(db_url: str = DATABASE_URL) -> Session:
         engine = create_engine(db_url)
         inspector = inspect(engine)
         if "quotes" in inspector.get_table_names():
-            Base.metadata.drop_all(tables=[Quote.__table__], bind=engine)
-            info_logger.info("Existing table dropped.")
+            drop_existing_table(engine)
 
         Base.metadata.create_all(engine)
         info_logger.info("Database setup complete.")
 
         conn = create_session(engine)
         return conn
-
     except Exception as e:
         error_logger.error(f"Error setting up database: {e}", exc_info=True)
-        raise
+        
 
-
-def get_db_conn(url: str = DATABASE_URL) -> Session:
-    """Create connection to a database"""
+def get_db_conn(url: str = DATABASE_URL, db_file: str = DATABASE_FILE) -> Session:
+    """Create connection to an existing database"""
     try:
-        if not os.path.exists(DATABASE_FILE):
+        if not os.path.exists(db_file):
             error_logger.error(
                 "Database file does not exist. \
                     Initialize database with `quote init`"
@@ -85,5 +88,5 @@ def get_db_conn(url: str = DATABASE_URL) -> Session:
             return conn
     except Exception as e:
         error_logger.error(f"Error connecting to database: {e}", exc_info=True)
-        raise
+
 
