@@ -11,7 +11,7 @@ The Quote Manager CLI Tool is a Python-based command-line interface (CLI) applic
 - **Add New Quote**: Add new quotes to the database with text and category.
 - **List Quotes**: List quotes from the database, with optional category filtering.
 - **Logging**: Record logs for general and error events.
-- 
+- **Dev support**: Run make commands for testing and development.
 
 ## Requirements
 
@@ -47,13 +47,14 @@ curl -sSL https://install.python-poetry.org | python3 -
    ```
 4. **(Optional) Set up the database file path**
 
-By default, the application uses default.db for the database file. To use a different file, set the DATABASE_PATH environment variable:
+   By default, the application uses default.db for the database file. To use a
+   different file, set the DATABASE_PATH environment variable:
 
-```bash
-export DATABASE_PATH=path/to/your/database.db
-```
+   ```bash
+   export DATABASE_PATH=path/to/your/database.db
+   ```
 
-This variable can be set in your .env file or directly in your shell.
+   This variable can be set in your .env file or directly in your shell.
 
 
 ## Usage
@@ -61,37 +62,37 @@ Below are the main commands of the CLI Tool:
 
 1. **Initialize the Database (do this before using the tool for the first time):**
 
-```bash
-quote init
-```
+   ```bash
+   quote init
+   ```
 
-You can also specify a custom file path to a json file  of your choice:
-```bash
-quote init --file path/to/quotes.json
-```
+   You can also specify a custom file path to a json file  of your choice:
+   ```bash
+   quote init --file path/to/quotes.json
+   ```
 
 2. **Generate a random quote. Optionally, filter by category:**
 
-```bash
-quote generate
-quote generate --category "Motivation"
-```
+   ```bash
+   quote generate
+   quote generate --category "Motivation"
+   ```
 
 3. **Add a New Quote. Provide the category, text, and author:**
 
-```bash
-quote add --category "Wisdom" --text "Patience is a virtue." --author "Anonymous"
-```
+   ```bash
+   quote add --category "Wisdom" --text "Patience is a virtue." --author "Anonymous"
+   ```
 
 4. **List quotes. Optionally, filter by category:**
 
-```bash
-quote list
-quote list --category "Humor"
-```
+   ```bash
+   quote list
+   quote list --category "Humor"
+   ```
 
 ## Project Structure
-
+```
 Quote-Manager-CLI-Precious/
 │
 ├── quote_manager_cli/
@@ -113,7 +114,7 @@ Quote-Manager-CLI-Precious/
 ├── poetry.lock
 ├── pyproject.toml
 └── README.md
-
+```
 
 ## Testing and Development 
 
