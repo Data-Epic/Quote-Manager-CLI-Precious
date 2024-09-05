@@ -19,7 +19,6 @@ help:
 setup:
 	poetry shell
 	poetry install
-	wget https://raw.githubusercontent.com/shravan20/github-readme-quotes/main/customQuotes/category.json
 
 # Install dependencies
 .PHONY: install
