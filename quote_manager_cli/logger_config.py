@@ -3,16 +3,13 @@ import os
 
 
 def setup_loggers():
-    # Ensure the log directory exists
     log_directory = "./var/log"
     os.makedirs(log_directory, exist_ok=True)
 
-    # Define log file paths
     log_file = os.path.join(log_directory, "quote_manager.log")
     error_log_file = os.path.join(log_directory, "quote_manager-error.log")
 
-    # Create formatters
-    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    formatter = logging.Formatter("%(asctime)s - %(message)s")
 
     # Setup info logger
     info_logger = logging.getLogger("info_logger")

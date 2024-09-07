@@ -12,7 +12,7 @@ help:
 	@echo "  make type_check	- Run mypy to type check"
 	@echo "  make build     	- Build the package"
 	@echo "  make publish   	- Publish the package"
-	@echo "  make all_checks    - Run tests,  formatter, type check, linter, and clean"
+	@echo "  make all_checks    - Run tests, linter, formatter, type check,  and clean"
 
 # Setup environment
 .PHONY: setup
@@ -38,12 +38,12 @@ test:
 # Run linter
 .PHONY: lint
 lint:
-	poetry run flake8 quote_manager_cli
+	poetry run ruff check --fix quote_manager_cli
 
 # Format code
 .PHONY: format
 format:
-	poetry run black quote_manager_cli
+	poetry run ruff format quote_manager_cli
 
 # Run mypy
 .PHONY: type_check
@@ -59,7 +59,9 @@ clean:
 	@rm -rf .mypy_cache
 	@rm -rf .coverage
 	@rm -rf htmlcov
+	@rm -rf .ruff_cache/
+	@echo temp files cleaned
 
 # Run all checks
 .PHONY: all_checks
-all_checks: test format type_check lint clean
+all_checks: test lint format type_check  clean

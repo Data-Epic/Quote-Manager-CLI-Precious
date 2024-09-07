@@ -1,19 +1,13 @@
-from sqlalchemy import (
-    inspect,
-    create_engine,
-    Column,
-    Integer,
-    String,
-    DateTime,
-    Sequence,
-)
-from sqlalchemy.orm import sessionmaker, declarative_base, Session
-from datetime import datetime
-from typing import Any, Type, Optional
 import os
 import sys
-from .logger_config import info_logger, error_logger
+from datetime import datetime
+from typing import Any, Optional, Type
+
 from dotenv import load_dotenv
+from sqlalchemy import Column, DateTime, Integer, Sequence, String, create_engine, inspect
+from sqlalchemy.orm import Session, declarative_base, sessionmaker
+
+from .logger_config import error_logger, info_logger
 
 load_dotenv()
 
@@ -84,9 +78,7 @@ def init_db(db_url: str = DATABASE_URL) -> Optional[Session]:
     return None
 
 
-def get_db_conn(
-    url: str = DATABASE_URL, db_file: str = DATABASE_FILE
-) -> Optional[Session]:
+def get_db_conn(url: str = DATABASE_URL, db_file: str = DATABASE_FILE) -> Optional[Session]:
     """Create connection to an existing database"""
     try:
         if not os.path.exists(db_file):

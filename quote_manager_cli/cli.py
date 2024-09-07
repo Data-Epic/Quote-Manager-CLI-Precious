@@ -1,15 +1,17 @@
-import click
 import os
+from typing import Optional
+
+import click
+
+from .database import get_db_conn, init_db
+from .logger_config import error_logger, info_logger
 from .quote_manager import (
+    add_quote,
+    generate_random_quote,
+    list_quotes,
     load_quotes_from_json,
     load_quotes_to_db,
-    add_quote,
-    list_quotes,
-    generate_random_quote,
 )
-from .database import init_db, get_db_conn
-from typing import Optional
-from .logger_config import info_logger, error_logger
 
 
 @click.group()

@@ -1,8 +1,9 @@
-from .database import Quote
 import json
-from typing import Optional, Any
 import random
-from .logger_config import info_logger, error_logger
+from typing import Any, Optional
+
+from .database import Quote
+from .logger_config import error_logger, info_logger
 
 
 def load_quotes_from_json(file_path: str) -> dict[str, tuple]:
