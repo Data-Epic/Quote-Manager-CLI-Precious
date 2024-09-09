@@ -1,5 +1,3 @@
-
-
 # Quote Manager CLI Tool
 
 ## Overview

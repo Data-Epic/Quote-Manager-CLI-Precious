@@ -3,10 +3,13 @@ import os
 import pytest
 
 from quote_manager_cli.database import Quote, init_db
-from quote_manager_cli.quote_manager import (add_quote, generate_random_quote,
-                                             list_quotes,
-                                             load_quotes_from_json,
-                                             load_quotes_to_db)
+from quote_manager_cli.quote_manager import (
+    add_quote,
+    generate_random_quote,
+    list_quotes,
+    load_quotes_from_json,
+    load_quotes_to_db,
+)
 
 
 @pytest.fixture(scope="module")
@@ -73,11 +76,7 @@ def test_add_quote(test_db):
     add_quote(test_db, category, text, author)
 
     # Check if quote is added to the database
-    quote = (
-        test_db.query(Quote)
-        .filter_by(category=category, text=text, author=author)
-        .first()
-    )
+    quote = test_db.query(Quote).filter_by(category=category, text=text, author=author).first()
     assert quote is not None
 
     # Clean up
@@ -95,9 +94,7 @@ def test_list_quotes(test_db):
 
     # Add quotes to the database
     for quote_data in quotes_data:
-        new_quote = Quote(
-            text=quote_data["quote"], author=quote_data["author"], category=category
-        )
+        new_quote = Quote(text=quote_data["quote"], author=quote_data["author"], category=category)
         test_db.add(new_quote)
     test_db.commit()
 
@@ -121,9 +118,7 @@ def test_generate_random_quote(test_db):
 
     # Add quotes to the database
     for quote_data in quotes_data:
-        new_quote = Quote(
-            text=quote_data["quote"], author=quote_data["author"], category=category
-        )
+        new_quote = Quote(text=quote_data["quote"], author=quote_data["author"], category=category)
         test_db.add(new_quote)
     test_db.commit()
 

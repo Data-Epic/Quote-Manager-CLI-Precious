@@ -3,9 +3,14 @@ import pytest
 from sqlalchemy import inspect
 from sqlalchemy.orm import Session
 
-from quote_manager_cli.database import (Quote, create_session,
-                                        drop_existing_table, get_db_conn,
-                                        get_engine, init_db)
+from quote_manager_cli.database import (
+    Quote,
+    create_session,
+    drop_existing_table,
+    get_db_conn,
+    get_engine,
+    init_db,
+)
 
 
 @pytest.fixture(scope="module")

@@ -59,10 +59,7 @@ def test_init_with_empty_file(runner):
         pass
     result = runner.invoke(cli, ["init", "--file", "empty_quotes.json"])
     assert result.exit_code == 0
-    assert (
-        "Error: empty_quotes.json is empty or is not a valid JSON file."
-        in result.output
-    )
+    assert "Error: empty_quotes.json is empty or is not a valid JSON file." in result.output
     if os.path.exists("empty_quotes.json"):
         os.remove("empty_quotes.json")
 
@@ -78,10 +75,7 @@ def test_init_with_invalid_file(runner):
         f.write("This is not a valid json file.")
     result = runner.invoke(cli, ["init", "--file", "invalid_quotes.txt"])
     assert result.exit_code == 0
-    assert (
-        "Error: invalid_quotes.txt is empty or is not a valid JSON file."
-        in result.output
-    )
+    assert "Error: invalid_quotes.txt is empty or is not a valid JSON file." in result.output
     if os.path.exists("invalid_quotes.txt"):
         os.remove("invalid_quotes.txt")
 

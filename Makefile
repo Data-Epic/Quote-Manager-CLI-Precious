@@ -65,3 +65,4 @@ clean:
 # Run all checks
 .PHONY: all_checks
 all_checks: test lint format type_check  clean
+
