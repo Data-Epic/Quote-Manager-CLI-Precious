@@ -1,11 +1,13 @@
 import os
 import sys
 from datetime import datetime
-from typing import Any, Optional, Type
+from typing import Any, Type
 
 from dotenv import load_dotenv
 from sqlalchemy import Column, DateTime, Integer, Sequence, String, create_engine, inspect
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, declarative_base, sessionmaker
+
 
 from .logger_config import error_logger, info_logger
 
@@ -29,17 +31,17 @@ class Quote(Base):
     created_at = Column(DateTime, default=datetime.now)
 
 
-def get_engine(url: str = DATABASE_URL) -> Any:
+def get_engine(url: str = DATABASE_URL) -> Engine:
     """Creates and returns a new database engine."""
     try:
         engine = create_engine(url)
         return engine
     except Exception as e:
         error_logger.error(f"Error creating engine: {e}", exc_info=True)
-    return None
+        raise e
 
 
-def create_session(engine: Any) -> Optional[Session]:
+def create_session(engine: Engine) -> Session:
     """Creates and returns a new database session."""
     try:
         SessionLocal = sessionmaker(bind=engine)
@@ -47,19 +49,20 @@ def create_session(engine: Any) -> Optional[Session]:
         return SessionLocal()
     except Exception as e:
         error_logger.error(f"Error creating session: {e}", exc_info=True)
-    return None
+        raise e
 
 
-def drop_existing_table(engine: Any) -> None:
+def drop_existing_table(engine: Engine) -> None:
     """Drops the existing quotes table."""
     try:
         Base.metadata.drop_all(tables=[Quote.__table__], bind=engine)
         info_logger.info("Existing table dropped.")
     except Exception as e:
         error_logger.error(f"Error dropping table: {e}", exc_info=True)
+        raise e
 
 
-def init_db(db_url: str = DATABASE_URL) -> Optional[Session]:
+def init_db(db_url: str = DATABASE_URL) -> Session:
     """Sets up the quotes database and connects to it"""
     info_logger.info("Setting up database...")
     try:
@@ -75,10 +78,10 @@ def init_db(db_url: str = DATABASE_URL) -> Optional[Session]:
         return conn
     except Exception as e:
         error_logger.error(f"Error setting up database: {e}", exc_info=True)
-    return None
+        raise e
 
 
-def get_db_conn(url: str = DATABASE_URL, db_file: str = DATABASE_FILE) -> Optional[Session]:
+def get_db_conn(url: str = DATABASE_URL, db_file: str = DATABASE_FILE) -> Session:
     """Create connection to an existing database"""
     try:
         if not os.path.exists(db_file):
@@ -97,4 +100,5 @@ def get_db_conn(url: str = DATABASE_URL, db_file: str = DATABASE_FILE) -> Option
             return conn
     except Exception as e:
         error_logger.error(f"Error connecting to database: {e}", exc_info=True)
-    return None
+        raise e
+    
