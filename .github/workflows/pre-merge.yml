@@ -1,0 +1,54 @@
+name: Pre Merge checks
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  run_checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v3
+
+      - name: Setup a local virtual environment (if no poetry.toml file)
+        run: |
+          poetry config virtualenvs.create true --local
+          poetry config virtualenvs.in-project true --local
+          
+      - uses: actions/cache@v4
+        name: Cache the virtual environment based on the poetry.lock file
+        with:
+          path: ./.venv
+          key: venv-${{ hashFiles('poetry.lock') }}
+      
+      - name: Install dependencies
+        run: poetry install
+
+      - name: Run tests
+        run: make test
+
+      - name: Run linter
+        run: make lint
+
+      - name: Format code
+        run: make format
+
+      - name: Run type checking
+        run: make type_check
+
+      - name: Clean up
+        run: make clean
