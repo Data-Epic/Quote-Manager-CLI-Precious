@@ -15,14 +15,12 @@ from quote_manager_cli.database import (
 
 @pytest.fixture(scope="module")
 def test_engine():
-    # Create a test engine
     engine = get_engine()
     yield engine
 
 
 @pytest.fixture(scope="module")
 def test_session(test_engine):
-    # Create a test session
     session = create_session(test_engine)
     yield session
     session.close()
@@ -81,17 +79,14 @@ def test_get_db_conn_non_existent_db():
 
 def test_quote_model(test_session):
     """Test the Quote model."""
-    # Create a new quote
     new_quote = Quote(author="Author Name", text="This is a quote.")
     test_session.add(new_quote)
     test_session.commit()
 
-    # Query the quote
     quote = test_session.query(Quote).filter_by(author="Author Name").first()
     assert quote is not None
     assert quote.author == "Author Name"
     assert quote.text == "This is a quote."
 
-    # Clean up
     test_session.delete(quote)
     test_session.commit()

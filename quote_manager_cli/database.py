@@ -20,14 +20,13 @@ DATABASE_URL = f"duckdb:///{DATABASE_FILE}"
 Base: Type[Any] = declarative_base()
 
 
-# Define the Quote model
 class Quote(Base):
     __tablename__ = "quotes"
 
     id = Column(Integer, Sequence("id"), primary_key=True)
     text = Column(String, index=True)
-    author = Column(String)
-    category = Column(String)
+    author = Column(String(100))
+    category = Column(String(100))
     created_at = Column(DateTime, default=datetime.now)
 
 

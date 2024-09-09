@@ -32,5 +32,4 @@ def setup_loggers():
     return info_logger, error_logger
 
 
-# Call setup_loggers to configure the loggers
 info_logger, error_logger = setup_loggers()

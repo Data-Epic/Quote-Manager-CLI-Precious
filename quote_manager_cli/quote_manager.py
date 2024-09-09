@@ -52,7 +52,7 @@ def add_quote(db: Any, category: str, text: str, author: Optional[str] = None) -
     info_logger.info(f"Adding quote: {text} - {category}...")
 
     try:
-        category = category.lower()  # standardize category
+        category = category.lower()  
         if author is not None:
             new_quote = Quote(text=text, author=author, category=category)
         else:

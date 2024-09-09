@@ -102,26 +102,22 @@ def test_add_quote(runner, init_db):
 
 
 def test_generate_quote(runner, init_db):
-    # Generate a random quote
     result = runner.invoke(cli, ["generate", "--category", "category1"])
     assert result.exit_code == 0
     assert "Quote:" in result.output
     assert any(q in result.output for q in ["Quote 1", "Quote 2"])
 
-    # Check for no quotes in a category
     result = runner.invoke(cli, ["generate", "--category", "nonexistent_category"])
     assert result.exit_code == 0
     assert "No quotes found." in result.output
 
 
 def test_list_quotes(runner, init_db):
-    # List quotes from a category
     result = runner.invoke(cli, ["list", "--category", "category1"])
     assert result.exit_code == 0
     assert "Listing quotes for category: category1" in result.output
     assert any(q in result.output for q in ["Quote 1", "Quote 2"])
 
-    # Check for no quotes in a category
     result = runner.invoke(cli, ["list", "--category", "nonexistent_category"])
     assert result.exit_code == 0
     assert "No quotes found in nonexistent_category" in result.output
